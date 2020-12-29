@@ -1,15 +1,42 @@
 <template>
   <div>
-      商品管理
+    <el-button type="primary" @click="open">添加</el-button>
+    <v-table @edit="edit($event)"></v-table>
+    <v-show :info="info" ref="show"></v-show>
   </div>
 </template>
 
 <script>
+import vTable from "./components/table.vue";
+import vShow from "./components/show.vue";
 export default {
-
-}
+  data() {
+    return {
+      info: {
+        isshow: false,
+        isadd: true,
+      },
+    };
+  },
+  methods: {
+    // 点击添加按钮
+    open() {
+      this.info.isshow = true;
+      this.info.isadd = true;
+    },
+    // 编辑
+    edit(id) {
+      this.info.isshow = true;
+      this.info.isadd = false;
+      this.$refs.show.getOne(id);
+    },
+  },
+  components: {
+    vTable,
+    vShow,
+  },
+};
 </script>
 
 <style>
-
 </style>

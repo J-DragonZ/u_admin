@@ -1,21 +1,19 @@
-# u_admin
+## 项目进度
 
-> A Vue.js project
+#### 菜单管理 : ok
 
-## Build Setup
+#### 角色管理 : ok
 
-``` bash
-# install dependencies
-npm install
+#### 管理员管理 : ok
 
-# serve with hot reload at localhost:8080
-npm run dev
+#### 商品分类管理 : ok
 
-# build for production with minification
-npm run build
+#### 商品规格管理 : ok
 
-# build for production and view the bundle analyzer report
-npm run build --report
-```
+#### 商品管理 : 静态页√  其他×
 
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+#### 会员管理 : ok
+
+#### 轮播图管理 : ok
+
+#### 限时秒杀管理 : ×

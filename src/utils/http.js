@@ -343,4 +343,54 @@ export let specs_del = (obj) => {
     })
 }
 
-// ----------------------------------------
+// ---------------商品管理----------------------
+
+// 商品添加
+export let goods_add = (user) => {
+    return axios({
+        url: baseUrl + '/api/goodsadd',
+        method: 'post',
+        data: formData(user)
+    })
+}
+
+// 商品总数
+export let goods_count = () => {
+    return axios({
+        url: baseUrl + '/api/goodscount',
+    })
+}
+
+// 商品列表(分页)
+export let goods_list = (obj) => {
+    return axios({
+        url: baseUrl + '/api/goodslist',
+        params: obj
+    })
+}
+
+// 商品获取(一条) {id:id}
+export let goods_one = (obj) => {
+    return axios({
+        url: baseUrl + '/api/goodsinfo',
+        params: obj
+    })
+}
+
+// 商品修改
+export let goods_updata = (user) => {
+    return axios({
+        url: baseUrl + '/api/goodsedit',
+        method: 'post',
+        data: formData(user)
+    })
+}
+
+// 商品删除 {id:id}
+export let goods_del = (obj) => {
+    return axios({
+        url: baseUrl + '/api/goodsdelete',
+        method: 'post',
+        data: obj
+    })
+}

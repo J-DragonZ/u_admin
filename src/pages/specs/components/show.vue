@@ -75,9 +75,13 @@ export default {
   methods: {
     ...mapActions({
       specsList: "specs/specsList",
+      specsTotal: "specs/specsTotal",
     }),
     //  关闭提示框
     cancel() {
+      if (!this.info.isadd) {
+        this.empty();
+      }
       this.info.isshow = false;
     },
     // 清空数据
@@ -110,6 +114,8 @@ export default {
           this.cancel();
           // 清空数据
           this.empty();
+          // 刷新总数
+          this.specsTotal();
           // 刷新页面
           this.specsList();
         }
