@@ -5,36 +5,48 @@
       <div class="inp">
         <el-input
           placeholder="请输入账号"
-          v-model="user.name"
+          v-model="user.username"
           clearable
         ></el-input>
       </div>
       <div class="inp">
         <el-input
           placeholder="请输入密码"
-          v-model="user.pass"
+          v-model="user.password"
           clearable
           show-password
         ></el-input>
       </div>
-      <el-button type="primary" @click="toIndex">登录</el-button>
+      <el-button type="primary" @click="login">登录</el-button>
     </div>
   </div>
 </template>
 
 <script>
+import { mapActions } from "vuex";
+import { login } from "../../utils/http.js";
 export default {
   data() {
     return {
       user: {
-        name: "",
-        pass: "",
+        username: "",
+        password: "",
       },
     };
   },
   methods: {
-    toIndex() {
-      this.$router.push("/");
+    ...mapActions({
+      changeUser: "changeUser",
+    }),
+    login() {
+      login(this.user).then((res) => {
+        if (res.data.code === 200) {
+          // 如果登录成功,将用户信息存入状态层
+          this.changeUser(res.data.list);
+          // 跳转页面
+          this.$router.push("/");
+        }
+      });
     },
   },
 };

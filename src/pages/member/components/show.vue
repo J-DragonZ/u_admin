@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import { successAlert } from "../../../utils/alert.js";
+import { errorAlert, successAlert } from "../../../utils/alert.js";
 import { member_one, member_updata } from "../../../utils/http.js";
 export default {
   props: ["info"],
@@ -61,15 +61,34 @@ export default {
         }
       });
     },
+    checkProps() {
+      return new Promise((resolve) => {
+        if (this.user.phone === "") {
+          errorAlert("手机号不能为空");
+          return;
+        }
+        if (this.user.nickname === "") {
+          errorAlert("昵称不能为空");
+          return;
+        }
+        if (this.user.password === "") {
+          errorAlert("密码不能为空");
+          return;
+        }
+        resolve();
+      });
+    },
     // 修改
     updata() {
-      member_updata(this.user).then((res) => {
-        if (res.data.code == 200) {
-          // 提示成功
-          successAlert(res.data.msg);
-          // 刷新页面
-          this.$emit("init");
-        }
+      this.checkProps().then(() => {
+        member_updata(this.user).then((res) => {
+          if (res.data.code == 200) {
+            // 提示成功
+            successAlert(res.data.msg);
+            // 刷新页面
+            this.$emit("init");
+          }
+        });
       });
     },
     // 取消

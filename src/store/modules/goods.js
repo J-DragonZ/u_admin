@@ -1,6 +1,6 @@
 
 
-import { specs_list, specs_count } from "../../utils/http.js"
+import { goods_list, goods_count } from "../../utils/http.js"
 
 let state = {
     // 定义初始值
@@ -45,42 +45,36 @@ let getters = {
 
 let actions = {
     // 列表页
-    specsList(context, bool) {
+    goodsList(context, bool) {
         let params = bool ? {} : { page: context.state.page, size: context.state.size }
-        specs_list(params).then(res => {
-            if (res.data.code === 200) {
+        goods_list(params).then(res => {
+            if (res.data.code == 200) {
                 // 如果删除最后一页最后一个数据,将当前修改为最后页-1.重新获取页面
-                if (res.data.list.length === 0 && context.state.page > 1) {
+                if (res.data.list.length == 0 && context.state.page > 1) {
                     context.commit('changePage', context.state.page - 1)
                     // 刷新页面
-                    context.dispatch('specsList')
+                    context.dispatch('goodsList')
                     return
                 }
-                // 创建临时变量来更改为正确的数据
-                let temp = res.data.list
-                temp.forEach(item => {
-                    item.attrs = JSON.parse(item.attrs)
-                })
-                console.log(temp);
                 // 将正确的数据赋值给list
-                context.commit('changeList', temp)
+                context.commit('changeList', res.data.list)
             }
         })
     },
     // 总数
-    specsTotal(context) {
-        specs_count().then(res => {
+    goodsTotal(context) {
+        goods_count().then(res => {
             if (res.data.code == 200) {
                 context.commit('changeTotal', res.data.list[0].total)
             }
         })
     },
     // 修改页面
-    specsPage(context, num) {
+    goodsPage(context, num) {
         // 修改当前页
         context.commit('changePage', num)
         // 刷新页面
-        context.dispatch('specsList')
+        context.dispatch('goodsList')
     }
 }
 

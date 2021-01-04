@@ -77,7 +77,7 @@
 <script>
 import { indexRoutes } from "../../../router/index.js";
 import { menu_add, menu_one, menu_updata } from "../../../utils/http.js";
-import { successAlert } from "../../../utils/alert.js";
+import { errorAlert, successAlert } from "../../../utils/alert.js";
 export default {
   props: ["info", "list"],
   data() {
@@ -118,18 +118,33 @@ export default {
         status: 1,
       };
     },
-    add() {
-      menu_add(this.user).then((res) => {
-        if (res.data.code === 200) {
-          // 如果成功 弹出提示框
-          successAlert(res.data.msg);
-          // 输入页面消失
-          this.cancel();
-          // 输入页面清空数据
-          this.empit();
-          // 页面刷新
-          this.$emit("init");
+    checkProps() {
+      return new Promise((resolve) => {
+        if (this.user.title === "") {
+          errorAlert("菜单名称不能为空");
+          return;
         }
+        if (this.user.pid === "") {
+          errorAlert("上级菜单不能为空");
+          return;
+        }
+        resolve();
+      });
+    },
+    add() {
+      this.checkProps().then(() => {
+        menu_add(this.user).then((res) => {
+          if (res.data.code === 200) {
+            // 如果成功 弹出提示框
+            successAlert(res.data.msg);
+            // 输入页面消失
+            this.cancel();
+            // 输入页面清空数据
+            this.empit();
+            // 页面刷新
+            this.$emit("init");
+          }
+        });
       });
     },
     changePid() {
@@ -149,13 +164,15 @@ export default {
       });
     },
     updata() {
-      menu_updata(this.user).then((res) => {
-        if (res.data.code === 200) {
-          successAlert(res.data.msg);
-          this.cancel();
-          this.empit();
-          this.$emit("init");
-        }
+      this.checkProps().then(() => {
+        menu_updata(this.user).then((res) => {
+          if (res.data.code === 200) {
+            successAlert(res.data.msg);
+            this.cancel();
+            this.empit();
+            this.$emit("init");
+          }
+        });
       });
     },
   },

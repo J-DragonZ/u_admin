@@ -56,7 +56,7 @@
 </template>
 
 <script>
-import { successAlert } from "../../../utils/alert.js";
+import { errorAlert, successAlert } from "../../../utils/alert.js";
 import { specs_add, specs_one, specs_updata } from "../../../utils/http.js";
 import { mapGetters, mapActions } from "vuex";
 export default {
@@ -101,24 +101,41 @@ export default {
     delAttr(index) {
       this.addAttrs.splice(index, 1);
     },
+    checkProps() {
+      return new Promise((resolve) => {
+        if (this.user.specsname == "") {
+          errorAlert("规格名称不能为空");
+          return;
+        }
+        if (this.addAttrs.some((item) => item.value == "")) {
+          errorAlert("规格属性不能为空");
+          return;
+        }
+        resolve();
+      });
+    },
     // 添加功能
     add() {
-      // 赋值给attrs正确的值
-      this.user.attrs = JSON.stringify(this.addAttrs.map((item) => item.value));
-      // 发送请求
-      specs_add(this.user).then((res) => {
-        if (res.data.code == 200) {
-          // 提示成功
-          successAlert(res.data.msg);
-          // 弹框消失
-          this.cancel();
-          // 清空数据
-          this.empty();
-          // 刷新总数
-          this.specsTotal();
-          // 刷新页面
-          this.specsList();
-        }
+      this.checkProps().then(() => {
+        // 赋值给attrs正确的值
+        this.user.attrs = JSON.stringify(
+          this.addAttrs.map((item) => item.value)
+        );
+        // 发送请求
+        specs_add(this.user).then((res) => {
+          if (res.data.code == 200) {
+            // 提示成功
+            successAlert(res.data.msg);
+            // 弹框消失
+            this.cancel();
+            // 清空数据
+            this.empty();
+            // 刷新总数
+            this.specsTotal();
+            // 刷新页面
+            this.specsList();
+          }
+        });
       });
     },
     // 获取一条数据
@@ -133,18 +150,22 @@ export default {
     },
     // 修改
     updata() {
-      this.user.attrs = JSON.stringify(this.addAttrs.map((item) => item.value));
-      specs_updata(this.user).then((res) => {
-        if (res.data.code == 200) {
-          // 提示成功
-          successAlert(res.data.msg);
-          // 弹框消失
-          this.cancel();
-          // 清空数据
-          this.empty();
-          // 刷新页面
-          this.specsList();
-        }
+      this.checkProps().then(() => {
+        this.user.attrs = JSON.stringify(
+          this.addAttrs.map((item) => item.value)
+        );
+        specs_updata(this.user).then((res) => {
+          if (res.data.code == 200) {
+            // 提示成功
+            successAlert(res.data.msg);
+            // 弹框消失
+            this.cancel();
+            // 清空数据
+            this.empty();
+            // 刷新页面
+            this.specsList();
+          }
+        });
       });
     },
   },

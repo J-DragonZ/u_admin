@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import { successAlert } from "../../../utils/alert.js";
+import { errorAlert, successAlert } from "../../../utils/alert.js";
 import { manage_add, manage_one, manage_edit } from "../../../utils/http.js";
 export default {
   props: ["info", "roleList"],
@@ -78,18 +78,37 @@ export default {
         status: 1,
       };
     },
-    manageAdd() {
-      manage_add(this.user).then((res) => {
-        if (res.data.code === 200) {
-          // 提示成功
-          successAlert(res.data.msg);
-          // 关闭弹框
-          this.cancel();
-          // 清空数据
-          this.empit();
-          // 刷新页面
-          this.$emit("init");
+    checkProps() {
+      return new Promise((resolve) => {
+        if (this.user.roleid === "") {
+          errorAlert("所属角色不能为空");
+          return;
         }
+        if (this.user.username === "") {
+          errorAlert("用户名不能为空");
+          return;
+        }
+        if (this.user.password === "") {
+          errorAlert("密码不能为空");
+          return;
+        }
+        resolve();
+      });
+    },
+    manageAdd() {
+      this.checkProps().then(() => {
+        manage_add(this.user).then((res) => {
+          if (res.data.code === 200) {
+            // 提示成功
+            successAlert(res.data.msg);
+            // 关闭弹框
+            this.cancel();
+            // 清空数据
+            this.empit();
+            // 刷新页面
+            this.$emit("init");
+          }
+        });
       });
     },
     getOne(uid) {
@@ -102,17 +121,19 @@ export default {
       });
     },
     updata() {
-      manage_edit(this.user).then((res) => {
-        if (res.data.code == 200) {
-          //弹成功
-          successAlert(res.data.msg);
-          //弹框消失
-          this.cancel();
-          //数据清空
-          this.empit();
-          //刷新list
-          this.$emit("init");
-        }
+      this.checkProps().then(() => {
+        manage_edit(this.user).then((res) => {
+          if (res.data.code == 200) {
+            //弹成功
+            successAlert(res.data.msg);
+            //弹框消失
+            this.cancel();
+            //数据清空
+            this.empit();
+            //刷新list
+            this.$emit("init");
+          }
+        });
       });
     },
   },

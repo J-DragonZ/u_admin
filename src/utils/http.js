@@ -2,6 +2,8 @@ import axios from 'axios'
 import qs from 'qs'
 import Vue from 'vue'
 import { errorAlert } from './alert.js'
+import store from '../store/index.js'
+import router from '../router/index.js'
 
 
 // 开发环境
@@ -12,6 +14,14 @@ Vue.prototype.$pre = 'http://localhost:3000'
 // let baseUrl = ''
 // Vue.prototype.$pre = ''
 
+// 添加请求头
+axios.interceptors.request.use(config => {
+    if (config.url !== baseUrl + '/api/userlogin') {
+        config.headers.authorization = store.state.userInfo.token
+    }
+    return config
+})
+
 // 响应拦截
 axios.interceptors.response.use(res => {
     if (res.data.code !== 200) {
@@ -21,6 +31,15 @@ axios.interceptors.response.use(res => {
     if (!res.data.list) {
         res.data.list = []
     }
+
+    // 掉线处理
+    if (res.data.msg === '登录已过期或访问权限受限') {
+        // 前段清空登录信息
+        store.dispatch('changeUser', {})
+        // 跳转到登录页
+        router.push('/login')
+    }
+
     console.group("本次请求地址是：" + res.config.url)
     console.log(res);
     console.groupEnd()
@@ -34,6 +53,14 @@ function formData(obj) {
         data.append(key, obj[key])
     }
     return data
+}
+// ---------------登录--------------------------
+export let login = (user) => {
+    return axios({
+        url: baseUrl + '/api/userlogin',
+        method: 'post',
+        data: qs.stringify(user)
+    })
 }
 
 // ----------------------------------------------
@@ -105,7 +132,7 @@ export let role_del = (obj) => {
     return axios({
         url: baseUrl + '/api/roledelete',
         method: 'post',
-        data: obj
+        data: qs.stringify(obj)
     })
 }
 
@@ -339,7 +366,7 @@ export let specs_del = (obj) => {
     return axios({
         url: baseUrl + '/api/specsdelete',
         method: 'post',
-        data: obj
+        data: qs.stringify(obj)
     })
 }
 
@@ -391,6 +418,49 @@ export let goods_del = (obj) => {
     return axios({
         url: baseUrl + '/api/goodsdelete',
         method: 'post',
-        data: obj
+        data: qs.stringify(obj)
+    })
+}
+
+// -----------限时秒杀---------------------
+// 限时秒杀添加
+export let seckill_add = (user) => {
+    return axios({
+        url: baseUrl + '/api/seckadd',
+        method: 'post',
+        data: qs.stringify(user)
+    })
+}
+
+// 限时秒杀列表
+export let seckill_list = () => {
+    return axios({
+        url: baseUrl + '/api/secklist'
+    })
+}
+
+// 限时秒杀获取一条 {id:id}
+export let seckill_one = (obj) => {
+    return axios({
+        url: baseUrl + '/api/seckinfo',
+        params: obj
+    })
+}
+
+// 限时秒杀修改
+export let seckill_updata = (user) => {
+    return axios({
+        url: baseUrl + '/api/seckedit',
+        method: 'post',
+        data: qs.stringify(user)
+    })
+}
+
+// 限时秒杀删除 {id:id}
+export let seckill_del = (obj) => {
+    return axios({
+        url: baseUrl + '/api/seckdelete',
+        method: 'post',
+        data: qs.stringify(obj)
     })
 }

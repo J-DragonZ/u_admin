@@ -44,7 +44,8 @@
 </template>
 
 <script>
-import { successAlert } from "../../../utils/alert.js";
+import { mapActions, mapGetters } from "vuex";
+import { errorAlert, successAlert } from "../../../utils/alert.js";
 import { role_add, role_one, role_updata } from "../../../utils/http.js";
 export default {
   props: ["info", "list_show"],
@@ -61,7 +62,15 @@ export default {
       },
     };
   },
+  computed: {
+    ...mapGetters({
+      userInfo: "userInfo",
+    }),
+  },
   methods: {
+    ...mapActions({
+      changeUser: "changeUser",
+    }),
     // 关闭弹框
     cancel() {
       if (!this.info.isadd) {
@@ -79,21 +88,36 @@ export default {
         status: 1,
       };
     },
+    checkProps() {
+      return new Promise((resolve) => {
+        if (this.user.rolename === "") {
+          errorAlert("角色名称不能为空");
+          return;
+        }
+        if (this.$refs.tree.getCheckedKeys().length <= 0) {
+          errorAlert("角色权限不能为空");
+          return;
+        }
+        resolve();
+      });
+    },
     // 添加角色管理
     roleAdd() {
-      this.user.menus = JSON.stringify(this.$refs.tree.getCheckedKeys());
-      role_add(this.user).then((res) => {
-        if (res.data.code === 200) {
-          successAlert(res.data.msg);
-          // 弹框消失
-          this.cancel();
-          // 清空数据
-          this.empit();
-          // 清空复选框数据
-          this.$refs.tree.setCheckedKeys([]);
-          // 刷新页面
-          this.$emit("init");
-        }
+      this.checkProps().then(() => {
+        this.user.menus = JSON.stringify(this.$refs.tree.getCheckedKeys());
+        role_add(this.user).then((res) => {
+          if (res.data.code === 200) {
+            successAlert(res.data.msg);
+            // 弹框消失
+            this.cancel();
+            // 清空数据
+            this.empit();
+            // 清空复选框数据
+            this.$refs.tree.setCheckedKeys([]);
+            // 刷新页面
+            this.$emit("init");
+          }
+        });
       });
     },
     getOne(id) {
@@ -107,14 +131,23 @@ export default {
       });
     },
     updata() {
-      this.user.menus = JSON.stringify(this.$refs.tree.getCheckedKeys());
-      role_updata(this.user).then((res) => {
-        this.cancel();
-        this.empit();
-        // 清空复选框数据
-        this.$refs.tree.setCheckedKeys([]);
-        // 刷新页面
-        this.$emit("init");
+      this.checkProps().then(() => {
+        this.user.menus = JSON.stringify(this.$refs.tree.getCheckedKeys());
+        role_updata(this.user).then((res) => {
+          successAlert(res.data.msg);
+          // 判断是否修改的是当前的角色
+          if (this.user.id === this.userInfo.roleid) {
+            this.changeUser({});
+            this.$router.push("/login");
+            return;
+          }
+          this.cancel();
+          this.empit();
+          // 清空复选框数据
+          this.$refs.tree.setCheckedKeys([]);
+          // 刷新页面
+          this.$emit("init");
+        });
       });
     },
   },

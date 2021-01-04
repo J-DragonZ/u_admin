@@ -130,18 +130,33 @@ export default {
         status: 1,
       };
     },
-    add() {
-      cate_add(this.user).then((res) => {
-        if (res.data.code === 200) {
-          // 如果成功 弹出提示框
-          successAlert(res.data.msg);
-          // 输入页面消失
-          this.cancel();
-          // 输入页面清空数据
-          this.empit();
-          // 页面刷新
-          this.cateList()
+    checkProps() {
+      return new Promise((resolve) => {
+        if (this.user.pid === "") {
+          errorAlert("上级分类不能为空");
+          return;
         }
+        if (this.user.catename === "") {
+          errorAlert("分类名称不能为空");
+          return;
+        }
+        resolve();
+      });
+    },
+    add() {
+      this.checkProps().then(() => {
+        cate_add(this.user).then((res) => {
+          if (res.data.code === 200) {
+            // 如果成功 弹出提示框
+            successAlert(res.data.msg);
+            // 输入页面消失
+            this.cancel();
+            // 输入页面清空数据
+            this.empit();
+            // 页面刷新
+            this.cateList();
+          }
+        });
       });
     },
     getOne(id) {
@@ -156,13 +171,15 @@ export default {
       });
     },
     updata() {
-      cate_updata(this.user).then((res) => {
-        if (res.data.code === 200) {
-          successAlert(res.data.msg);
-          this.cancel();
-          this.empit();
-          this.cateList()
-        }
+      this.checkProps().then(() => {
+        cate_updata(this.user).then((res) => {
+          if (res.data.code === 200) {
+            successAlert(res.data.msg);
+            this.cancel();
+            this.empit();
+            this.cateList();
+          }
+        });
       });
     },
   },

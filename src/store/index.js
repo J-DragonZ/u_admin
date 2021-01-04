@@ -7,6 +7,8 @@ import { actions } from './actions'
 // 引入
 import cate from './modules/cate.js'
 import specs from './modules/specs.js'
+import goods from './modules/goods.js'
+import seckill from './modules/seckill.js'
 
 export default new Vuex.Store({
     state,
@@ -16,6 +18,8 @@ export default new Vuex.Store({
     // 注册
     modules: {
         cate,
-        specs
+        specs,
+        goods,
+        seckill
     }
 })

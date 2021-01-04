@@ -85,7 +85,6 @@ export default {
     changeImg(e) {
       // 保存图片的信息
       let file = e.raw;
-      console.log(file);
       // 判断文件大小
       if (file.size > 2 * 1024 * 1024) {
         errorAlert("文件大小不能超过2MB");
@@ -104,19 +103,34 @@ export default {
       this.user.img = file;
     },
 
+    checkProps() {
+      return new Promise((resolve) => {
+        if (this.user.title === "") {
+          errorAlert("标题不能为空");
+          return;
+        }
+        if (!this.user.img) {
+          errorAlert("请上传图片");
+          return;
+        }
+        resolve();
+      });
+    },
     // 轮播图添加
     add() {
-      banner_add(this.user).then((res) => {
-        if (res.data.code == 200) {
-          // 提示添加成功
-          successAlert(res.data.msg);
-          // 关闭弹框
-          this.cancel();
-          // 清空数据
-          this.empty();
-          // 刷新页面
-          this.$emit("init");
-        }
+      this.checkProps().then(() => {
+        banner_add(this.user).then((res) => {
+          if (res.data.code == 200) {
+            // 提示添加成功
+            successAlert(res.data.msg);
+            // 关闭弹框
+            this.cancel();
+            // 清空数据
+            this.empty();
+            // 刷新页面
+            this.$emit("init");
+          }
+        });
       });
     },
 
@@ -134,17 +148,19 @@ export default {
     },
     // 修改
     updata() {
-      banner_updata(this.user).then((res) => {
-        if (res.data.code == 200) {
-          // 提示成功
-          successAlert(res.data.msg);
-          // 关闭弹框
-          this.cancel();
-          // 清空数据
-          this.empty();
-          // 刷新页面
-          this.$emit("init");
-        }
+      this.checkProps().then(() => {
+        banner_updata(this.user).then((res) => {
+          if (res.data.code == 200) {
+            // 提示成功
+            successAlert(res.data.msg);
+            // 关闭弹框
+            this.cancel();
+            // 清空数据
+            this.empty();
+            // 刷新页面
+            this.$emit("init");
+          }
+        });
       });
     },
   },
